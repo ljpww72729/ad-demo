@@ -1,0 +1,80 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+
+        <EditText
+            android:id="@+id/deeplinks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:hint="请输入深度链接" />
+
+        <TextView
+            android:id="@+id/showAD"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/fab_margin"
+            android:text="模拟展示广告" />
+
+
+        <TextView
+            android:id="@+id/webview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/fab_margin"
+            android:text="Open in webview(模拟点击广告)" />
+
+        <TextView
+            android:id="@+id/default_browser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/fab_margin"
+            android:text="Open in default Browser" />
+
+        <TextView
+            android:id="@+id/chrome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/fab_margin"
+            android:text="Open in chrome" />
+
+        <TextView
+            android:id="@+id/uc_browser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/fab_margin"
+            android:text="Open in UCBrowser" />
+
+        <TextView
+            android:id="@+id/qq_browser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/fab_margin"
+            android:text="Open in QQBrowser" />
+
+        <TextView
+            android:id="@+id/liebao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/fab_margin"
+            android:text="Open in liebao" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/fab_margin"
+            android:text="注意事项:以上虽然可指定浏览器唤起应用,但实际操作不需要指定浏览器唤起!!!"
+            android:textColor="@color/colorAccent" />
+
+
+    </LinearLayout>
+</ScrollView>
