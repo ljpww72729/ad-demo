@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import java.net.URISyntaxException;
 
@@ -36,13 +37,15 @@ public class CustomWebviewActivity extends AppCompatActivity {
         //允许javascript
         webSettings.setJavaScriptEnabled(true);
 //        start_webview.addJavascriptInterface(new MyJavaScriptInterface(this), "HtmlViewer");
-        start_webview.loadUrl(getIntent().getStringExtra("deeplink_url") + "?"+ DeviceInfo.getInstance(CustomWebviewActivity.this).getParams("com.ctoutiao", "1"));
+//        start_webview.loadUrl(getIntent().getStringExtra("deeplink_url") + "?"+ DeviceInfo.getInstance(CustomWebviewActivity.this).getParams("com.ctoutiao", "1"));
+        start_webview.loadUrl(getIntent().getStringExtra("deeplink_url"));
         start_webview.setWebViewClient(new WebViewClient() {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
                 //重写该方法是为了处理uri scheme,对于uri scheme则直接唤起APP
+
 
 
                 //去掉回车、换行、tab
@@ -70,8 +73,10 @@ public class CustomWebviewActivity extends AppCompatActivity {
                             if (info != null) {
                                 //如果有可接受该intent的APP则直接唤起APP
                                 //intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                                Toast.makeText(CustomWebviewActivity.this, "已安装APP并开始唤起", Toast.LENGTH_LONG).show();
                                 startActivity(intent);
                             } else {
+                                Toast.makeText(CustomWebviewActivity.this, "未安装APP跳转到自定义页面", Toast.LENGTH_LONG).show();
                                 //否则加载回调页面
                                 String fallbackUrl = intent.getStringExtra("browser_fallback_url");
 
@@ -118,6 +123,8 @@ public class CustomWebviewActivity extends AppCompatActivity {
 
         });
     }
+
+
 
 //    class MyJavaScriptInterface {
 //

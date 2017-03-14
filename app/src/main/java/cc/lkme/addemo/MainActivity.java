@@ -2,6 +2,7 @@ package cc.lkme.addemo;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
@@ -11,6 +12,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,18 +25,28 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static cc.lkme.addemo.LMConstants.DOWNLOAD_FILE_NAME;
+import static cc.lkme.addemo.LMConstants.DOWNLOAD_FILE_URL;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 1000;
-    EditText deeplinks;
+    EditText deeplinks, package_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getPermission(MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1002);
+        }
         deeplinks = (EditText) findViewById(R.id.deeplinks);
-        deeplinks.setText("https://lkme.cc/IfC/yGs2hfPK8");
+//        deeplinks.setText("https://lkme.cc/IfC/yGs2hfPK8");
+//        deeplinks.setText("http://linkedme.cc:9099/browser/aaa_lipeng.jsp");
+        deeplinks.setText("https://www.linkedme.cc/h5/partner");
+        package_name = (EditText) findViewById(R.id.package_name);
+        package_name.setText("com.ctoutiao");
         TextView webview = (TextView) findViewById(R.id.webview);
         webview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         try {
                             connectService("https://lkme.cc/i/ad/monitor?" + DeviceInfo.getInstance(MainActivity.this).getParams("com.ctoutiao", "0"));
+//                            connectService("http://lkme.cc/ad/openapi/get_ad?imei=863267033980153&linkedme_key=4c6d903b4b44eab7c990e0ce6f9c1e03&ad_position=11132_0&os=Android&os_version=6.0.1&device_model=OPPO+R9s+Plus&app_version=5.7.6.4-debug&carrier=%E4%B8%AD%E5%9B%BD%E8%81%94%E9%80%9A&net=WIFI&timestamp=1487744414084");
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -149,6 +163,47 @@ public class MainActivity extends AppCompatActivity {
                 }).start();
             }
         });
+        TextView open_package = (TextView) findViewById(R.id.open_package);
+        open_package.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String package_name_str = package_name.getText().toString().trim();
+                if (!TextUtils.isEmpty(package_name_str)) {
+                    if (isPkgInstalled(package_name_str)) {
+                        Toast.makeText(MainActivity.this, "已安装APP并开始唤起", Toast.LENGTH_LONG).show();
+                        Intent resolveIntent = MainActivity.this.getPackageManager().getLaunchIntentForPackage(package_name_str);// 这里的packname就是从上面得到的目标apk的包名
+                        // 启动目标应用
+                        if (resolveIntent != null) {
+                            MainActivity.this.startActivity(resolveIntent);
+                        }
+                    } else {
+                        Toast.makeText(MainActivity.this, "未安装APP", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "包名不能为空", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        TextView service_down_apk = (TextView) findViewById(R.id.service_down_apk);
+        service_down_apk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "http://101.201.51.238:9099/browser/demo.apk";
+                Intent intent = new Intent(MainActivity.this, LMDownloadService.class);
+                intent.putExtra(DOWNLOAD_FILE_URL, url);
+                intent.putExtra(DOWNLOAD_FILE_NAME, "lm" + System.currentTimeMillis() + ".apk");
+                startService(intent);
+            }
+        });
+        TextView uri_scheme = (TextView) findViewById(R.id.uri_scheme);
+        uri_scheme.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, UriSchemeActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
 
@@ -161,7 +216,9 @@ public class MainActivity extends AppCompatActivity {
             conn.setReadTimeout(10000 /* milliseconds */);
             conn.setConnectTimeout(15000 /* milliseconds */);
             conn.setRequestMethod("GET");
-            conn.setDoInput(true);
+            conn.setInstanceFollowRedirects(false);
+            conn.setRequestProperty("Content-Type", "text/plain");
+            conn.setRequestProperty("charset", "utf-8");
             // Starts the query
             conn.connect();
             int response = conn.getResponseCode();
@@ -169,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Convert the InputStream into a string
             String contentAsString = getStringFromInputStream(is);
+            Log.d("LinkedME", "connectService response : " + contentAsString);
             return contentAsString;
 
             // Makes sure that the InputStream is closed after the app is
@@ -249,4 +307,21 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    /**
+     * 判断本机是否已经安装了APP
+     */
+    private boolean isPkgInstalled(String pkgName) {
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = MainActivity.this.getPackageManager().getPackageInfo(pkgName, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            packageInfo = null;
+            e.printStackTrace();
+        }
+        if (packageInfo == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
