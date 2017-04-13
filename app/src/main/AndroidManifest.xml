@@ -25,12 +25,11 @@
                     android:resource="@xml/provider_paths"/>
         </provider>
 
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+        <activity
+                android:name=".MainActivity"
+                android:windowSoftInputMode="stateHidden"
+                android:screenOrientation="portrait">
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
                 android:name=".CustomWebviewActivity"
@@ -40,8 +39,20 @@
                 android:name=".LMDownloadService"
                 android:exported="false"/>
 
-        <activity android:name=".UriSchemeActivity"
-                android:screenOrientation="portrait">
+        <activity
+                android:name=".UriSchemeActivity"
+                android:screenOrientation="portrait"
+                android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity
+                android:name=".UriSchemeListActivity"
+                android:screenOrientation="portrait"
+                android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 

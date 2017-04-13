@@ -204,6 +204,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        TextView uri_scheme_list = (TextView) findViewById(R.id.uri_scheme_list);
+        uri_scheme_list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, UriSchemeListActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
 

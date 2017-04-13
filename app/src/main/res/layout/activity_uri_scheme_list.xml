@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="cc.lkme.addemo.UriSchemeListActivity">
+
+        <RelativeLayout
+                android:id="@+id/topPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <TextView
+                    android:id="@+id/uri_scheme_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:layout_centerVertical="true"
+                    android:text="Uri Scheme："/>
+
+            <EditText
+                    android:layout_toRightOf="@+id/uri_scheme_label"
+                    android:id="@+id/uri_scheme"
+                    android:layout_toLeftOf="@+id/btnPanel"
+                    android:layout_centerVertical="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:maxLines="2"/>
+
+
+            <TextView
+                    android:id="@+id/result"
+                    tools:text="@string/uri_tips"
+                    android:layout_alignBottom="@+id/btnPanel"
+                    android:layout_marginLeft="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                    android:id="@+id/btnPanel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:orientation="vertical">
+
+                <Button
+                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                        android:id="@+id/clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="清空"/>
+
+                <Button
+                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                        android:id="@+id/paste"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="粘贴"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <com.ww.lp.rvrl_lib.ScrollChildSwipeRefreshLayout
+                android:layout_below="@+id/topPanel"
+                android:id="@+id/lp_scsr"
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/lp_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+        </com.ww.lp.rvrl_lib.ScrollChildSwipeRefreshLayout>
+
+    </RelativeLayout>
+</layout>
