@@ -55,6 +55,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:text="@{lp_rv_item.installed ? @string/installed : @string/install}"
+                    android:textColor="@{lp_rv_item.installed ? @color/colorPrimary : @color/colorAccent}"
                     />
 
         </RelativeLayout>

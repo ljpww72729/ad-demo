@@ -24,6 +24,9 @@ import com.ww.lp.rvrl_lib.LPRefreshLoadListener;
 import com.ww.lp.rvrl_lib.ScrollChildSwipeRefreshLayout;
 import com.ww.lp.rvrl_lib.SingleItemClickListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import cc.lkme.addemo.databinding.ActivityUriSchemeListBinding;
@@ -57,7 +60,7 @@ public class UriSchemeListActivity extends AppCompatActivity {
         // specify an adapter (see also next example)
         mRVData = new ArrayList<>();
 //        lpRecyclerViewAdapter = new LPRecyclerViewAdapter<>(mRVData, R.layout.recycler_view_item, BR.lp_rv_item);
-        lpRecyclerViewAdapter = new LPRecyclerViewAdapter<>(mRVData, R.layout.recycler_view_item, BR.lp_rv_item, swipeRefreshLayout, null);
+        lpRecyclerViewAdapter = new LPRecyclerViewAdapter<>(mRVData, R.layout.recycler_view_item, cc.lkme.addemo.BR.lp_rv_item, swipeRefreshLayout, null);
 //        lpRecyclerViewAdapter.setPageStartNum(0);
 //        lpRecyclerViewAdapter.setOnLoadMoreListener(new LPRefreshLoadListener.OnLoadMoreListener() {
 //            @Override
@@ -157,12 +160,30 @@ public class UriSchemeListActivity extends AppCompatActivity {
 
     private void loadData() {
         ArrayList<AppInfo> data = new ArrayList<>();
-        String[] uri_scheme_arr = TextUtils.split(binding.uriScheme.getText().toString(), ";");
+        String uriScheme = binding.uriScheme.getText().toString();
+        String[] uri_scheme_arr;
+        if (!TextUtils.isEmpty(uriScheme)) {
+            try {
+                JSONObject jsonObject = new JSONObject(uriScheme);
+                uri_scheme_arr = new String[1];
+                uri_scheme_arr[0] = jsonObject.optString("android_scheme");
+            } catch (JSONException e) {
+                uri_scheme_arr = TextUtils.split(binding.uriScheme.getText().toString(), ";");
+                e.printStackTrace();
+            }
+        }else{
+            uri_scheme_arr = new String[0];
+        }
         for (String uri_scheme : uri_scheme_arr) {
             AppInfo appInfo = APPUtils.getAppInfoByScheme(this, uri_scheme);
-            if (appInfo != null) {
-                data.add(appInfo);
+            if (appInfo == null) {
+                appInfo = new AppInfo();
+                appInfo.setUriScheme(uri_scheme);
+                appInfo.setInstalled(false);
+                appInfo.setAppName("未知");
+                appInfo.setAppIconDrawable(ContextCompat.getDrawable(UriSchemeListActivity.this, R.drawable.no_app));
             }
+            data.add(appInfo);
         }
         if (uri_scheme_arr.length - data.size() == 0) {
             binding.result.setTextColor(ContextCompat.getColor(UriSchemeListActivity.this, R.color.colorPrimary));
