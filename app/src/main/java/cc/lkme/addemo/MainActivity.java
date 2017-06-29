@@ -213,6 +213,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        TextView show_img = (TextView) findViewById(R.id.show_img);
+        show_img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ShowImg.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
 

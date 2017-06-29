@@ -118,6 +118,23 @@ public class UriSchemeActivity extends AppCompatActivity {
                 APPUtils.openAppWithUriScheme(UriSchemeActivity.this, uri_scheme, packageName);
             }
         });
+
+        //关联启动
+//        ComponentName componet = new ComponentName("com.ljpww72729.rvrl", "com.ljpww72729.rvrl.LaunchService");
+//        Intent intent = new Intent();
+//        intent.setAction("com.ljpww72729.rvrl.launchservice");
+//        intent.setComponent(componet);
+//        startService(intent);
+
+        //uri scheme方式启动
+//        String uri_scheme = "ljpww72729_rvrl://";
+//        String packageName = "com.ljpww72729.rvrl";
+//        APPUtils.openAppWithUriScheme(UriSchemeActivity.this, uri_scheme, packageName);
+
+        //包名方式唤起
+//        String packageName = "com.ljpww72729.rvrl";
+//        Intent intent = getPackageManager().getLaunchIntentForPackage(packageName);
+//        startActivity(intent);
     }
 
     @Override
