@@ -34,6 +34,7 @@ public class APPUtils {
         }
     }
 
+
     /**
      * 通过uri scheme获取对应的应用信息
      *
@@ -65,6 +66,10 @@ public class APPUtils {
     }
 
     public static void openAppWithUriScheme(Context context, String uri_scheme, String packageName) {
+        openAppWithUriScheme(context, uri_scheme, packageName, true);
+    }
+
+    public static void openAppWithUriScheme(Context context, String uri_scheme, String packageName, boolean isSingltTask) {
         try {
             Log.d("linkedme", "openAppWithUriScheme: uri scheme ==== " + uri_scheme);
             if (TextUtils.isEmpty(uri_scheme)) {
@@ -83,7 +88,9 @@ public class APPUtils {
                 }
                 intent.setPackage(packageName);
             }
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (isSingltTask) {
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
             ResolveInfo resolveInfo =
                     context.getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
             if (resolveInfo != null) {

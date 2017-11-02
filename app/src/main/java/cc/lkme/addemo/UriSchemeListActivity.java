@@ -84,7 +84,7 @@ public class UriSchemeListActivity extends AppCompatActivity {
                 AppInfo appInfo = mRVData.get(position);
                 if (appInfo.isInstalled()) {
                     //安装则唤起app
-                    APPUtils.openAppWithUriScheme(UriSchemeListActivity.this, appInfo.getUriScheme(), null);
+                    APPUtils.openAppWithUriScheme(UriSchemeListActivity.this, appInfo.getUriScheme(), null, binding.cbSingle.isChecked());
                 } else {
                     //未安装则唤起应用宝安装
                     Uri uri = Uri.parse("market://details?id=" + appInfo.getPackageName());
@@ -171,7 +171,7 @@ public class UriSchemeListActivity extends AppCompatActivity {
                 uri_scheme_arr = TextUtils.split(binding.uriScheme.getText().toString(), ";");
                 e.printStackTrace();
             }
-        }else{
+        } else {
             uri_scheme_arr = new String[0];
         }
         for (String uri_scheme : uri_scheme_arr) {

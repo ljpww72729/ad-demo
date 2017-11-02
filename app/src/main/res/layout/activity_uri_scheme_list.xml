@@ -17,15 +17,14 @@
                     android:id="@+id/uri_scheme_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/uri_scheme"
                     android:layout_marginLeft="6dp"
-                    android:layout_centerVertical="true"
                     android:text="Uri Scheme："/>
 
             <EditText
                     android:layout_toRightOf="@+id/uri_scheme_label"
                     android:id="@+id/uri_scheme"
                     android:layout_toLeftOf="@+id/btnPanel"
-                    android:layout_centerVertical="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
@@ -35,7 +34,7 @@
             <TextView
                     android:id="@+id/result"
                     tools:text="@string/uri_tips"
-                    android:layout_alignBottom="@+id/btnPanel"
+                    android:layout_below="@+id/uri_scheme"
                     android:layout_marginLeft="6dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
@@ -60,6 +59,22 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="粘贴"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/result">
+
+                <CheckBox
+                        android:id="@+id/cb_single"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                <TextView
+                        android:text="以singleTask方式启动"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
             </LinearLayout>
 
         </RelativeLayout>
