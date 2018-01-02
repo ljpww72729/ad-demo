@@ -65,6 +65,29 @@ public class APPUtils {
         return appInfo;
     }
 
+    /**
+     * 通过包名获取对应的应用信息
+     *
+     * @param context Context
+     * @param pkgName 包名
+     * @return AppInfo应用信息对象。null则无可处理该uri scheme的应用，反之存在
+     */
+    public static AppInfo getPChklstInfoByPkgName(Context context, String pkgName) {
+        PChklstInfo appInfo = null;
+        Intent intent = new Intent();
+        intent.setPackage(pkgName);
+        ResolveInfo resolveInfo = context.getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (resolveInfo != null) {
+            appInfo = new PChklstInfo();
+            appInfo.setAppIconDrawable(resolveInfo.loadIcon(context.getPackageManager()));
+            appInfo.setAppName((String) resolveInfo.loadLabel(context.getPackageManager()));
+            //此处无法获取到icon的id，只能通过loadIcon获取icon的drawable
+            appInfo.setAppIcon(resolveInfo.getIconResource());
+            appInfo.setInstalled(true);
+        }
+        return appInfo;
+    }
+
     public static void openAppWithUriScheme(Context context, String uri_scheme, String packageName) {
         openAppWithUriScheme(context, uri_scheme, packageName, true);
     }

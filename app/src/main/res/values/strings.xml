@@ -2,5 +2,7 @@
     <string name="app_name">ADDemo</string>
     <string name="install">未安装</string>
     <string name="installed">已安装</string>
+    <string name="check_result_yes">是</string>
+    <string name="check_result_no">否</string>
     <string name="uri_tips">total:%1$d; resolved:%2$d; unresolved:%3$d</string>
 </resources>

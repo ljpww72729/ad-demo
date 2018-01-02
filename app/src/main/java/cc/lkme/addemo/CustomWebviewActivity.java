@@ -36,6 +36,9 @@ public class CustomWebviewActivity extends AppCompatActivity {
         WebSettings webSettings = start_webview.getSettings();
         //允许javascript
         webSettings.setJavaScriptEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            webSettings.setAllowUniversalAccessFromFileURLs(true);
+        }
 //        start_webview.addJavascriptInterface(new MyJavaScriptInterface(this), "HtmlViewer");
 //        start_webview.loadUrl(getIntent().getStringExtra("deeplink_url") + "?"+ DeviceInfo.getInstance(CustomWebviewActivity.this).getParams("com.ctoutiao", "1"));
         start_webview.loadUrl(getIntent().getStringExtra("deeplink_url"));
@@ -47,7 +50,6 @@ public class CustomWebviewActivity extends AppCompatActivity {
                 //重写该方法是为了处理uri scheme,对于uri scheme则直接唤起APP
 
 
-
                 //去掉回车、换行、tab
                 String stray_spacing = "[\n\r\t\\p{Zl}\\p{Zp}\u0085]+";
                 url = url.trim();
@@ -57,11 +59,11 @@ public class CustomWebviewActivity extends AppCompatActivity {
                 String http_scheme_slashes = "^(https?://)/+(.*)";
                 //(?i)后面的匹配不区分大小写
                 String all_schemes_pattern = "(?i)^(http|https|ftp|mms|rtsp|wais)://.*";
-                if (url.matches(all_schemes_pattern)){
+                if (url.matches(all_schemes_pattern)) {
                     view.loadUrl(url);
                     return false;
                 }
-                if (url.matches(rfc2396regex)){
+                if (url.matches(rfc2396regex)) {
                     try {
                         Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
 
@@ -87,7 +89,7 @@ public class CustomWebviewActivity extends AppCompatActivity {
 
                                     //或者:在WebView中加载
 //                                  view.loadUrl(fallbackUrl);
-                                }else{
+                                } else {
                                     // view.loadUrl(url);
                                     return super.shouldOverrideUrlLoading(view, url);
                                 }
@@ -113,7 +115,6 @@ public class CustomWebviewActivity extends AppCompatActivity {
             }
 
 
-
             @Override
             public void onPageFinished(WebView view, String url) {
                 // TODO Auto-generated method stub
@@ -123,7 +124,6 @@ public class CustomWebviewActivity extends AppCompatActivity {
 
         });
     }
-
 
 
 //    class MyJavaScriptInterface {

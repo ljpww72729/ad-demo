@@ -221,6 +221,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        TextView p_chklst = (TextView) findViewById(R.id.p_chklst);
+        p_chklst.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, PChklistActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 

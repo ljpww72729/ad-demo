@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -123,11 +124,16 @@ public class UriSchemeListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ClipboardManager cbm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                if (cbm.getPrimaryClip().getItemCount() > 0) {
-                    binding.uriScheme.setText("");
-                    binding.uriScheme.setText(cbm.getPrimaryClip().getItemAt(0).getText());
-                } else {
-                    Toast.makeText(UriSchemeListActivity.this, "剪切板中无内容！", Toast.LENGTH_SHORT).show();
+                if (cbm != null && cbm.hasPrimaryClip()) {
+                    if (cbm.getPrimaryClip().getItemCount() > 0) {
+                        binding.uriScheme.setText("");
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            cbm.getPrimaryClipDescription().getTimestamp();
+                        }
+                        binding.uriScheme.setText(cbm.getPrimaryClip().getItemAt(0).getText());
+                    } else {
+                        Toast.makeText(UriSchemeListActivity.this, "剪切板中无内容！", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });

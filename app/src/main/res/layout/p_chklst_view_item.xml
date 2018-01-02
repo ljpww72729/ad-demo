@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+                name="lp_rv_item"
+                type="cc.lkme.addemo.PChklstInfo"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1sp">
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <ImageView
+                    android:id="@+id/icon"
+                    android:layout_alignParentLeft="true"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:scaleType="centerInside"
+                    app:srcDrawable="@{lp_rv_item.appIconDrawable}"/>
+
+            <TextView
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/icon"
+                    android:id="@+id/app_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:textSize="18sp"
+                    android:text="@{lp_rv_item.appName}"/>
+
+            <TextView
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/icon"
+                    android:layout_alignParentBottom="true"
+                    android:id="@+id/uri_scheme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:layout_toLeftOf="@+id/install"
+                    android:maxLines="2"
+                    android:text="@{lp_rv_item.packageName}"/>
+
+            <Button
+                    android:id="@+id/install"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@{lp_rv_item.installed ? @string/installed : @string/install}"
+                    android:textColor="@{lp_rv_item.installed ? @color/colorPrimary : @color/colorAccent}"
+                    />
+
+            <Button
+                    android:id="@+id/check"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/install"
+                    android:text="@{lp_rv_item.checkResult ? @string/check_result_yes : @string/check_result_no}"
+                    android:textColor="@{lp_rv_item.checkResult ? @color/colorPrimary : @color/colorAccent}"
+                    />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+</layout>
