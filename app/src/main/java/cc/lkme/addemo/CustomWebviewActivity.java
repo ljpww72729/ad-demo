@@ -64,6 +64,7 @@ public class CustomWebviewActivity extends AppCompatActivity {
                     return false;
                 }
                 if (url.matches(rfc2396regex)) {
+                    // 朗易思听： 我们有个三秒的超时逻辑走market，因此当走market的uri scheme的时候，你直接过滤掉，不要唤起应用市场
                     try {
                         Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
 
@@ -73,11 +74,12 @@ public class CustomWebviewActivity extends AppCompatActivity {
                             PackageManager packageManager = getPackageManager();
                             ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
                             if (info != null) {
-                                //如果有可接受该intent的APP则直接唤起APP
+                                //朗易思听： 如果有可接受该intent的APP则直接唤起APP
                                 //intent.addCategory(Intent.CATEGORY_BROWSABLE);
                                 Toast.makeText(CustomWebviewActivity.this, "已安装APP并开始唤起", Toast.LENGTH_LONG).show();
                                 startActivity(intent);
                             } else {
+                                //朗易思听： 走到该逻辑，说明没有安装app，你native调用market唤起应用市场下载app
                                 Toast.makeText(CustomWebviewActivity.this, "未安装APP跳转到自定义页面", Toast.LENGTH_LONG).show();
                                 //否则加载回调页面
                                 String fallbackUrl = intent.getStringExtra("browser_fallback_url");

@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 1000;
     EditText deeplinks, package_name;
+    EditText app_pkg_name;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,6 +229,25 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, PChklistActivity.class);
                 startActivity(intent);
+            }
+        });
+        app_pkg_name = (EditText) findViewById(R.id.app_pkg_name);
+        TextView open_instant_app = (TextView) findViewById(R.id.open_instant_app);
+        open_instant_app.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (TextUtils.isEmpty(app_pkg_name.getText().toString())) {
+                    Toast.makeText(MainActivity.this, "请输入包名", Toast.LENGTH_SHORT).show();
+                } else {
+                    try {
+                        Intent intent = getPackageManager().getLaunchIntentForPackage(app_pkg_name.getText().toString().trim());
+                        startActivity(intent);
+                    } catch (Exception ignore) {
+                        ignore.printStackTrace();
+                        Toast.makeText(MainActivity.this, "无可打开的App", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
             }
         });
 

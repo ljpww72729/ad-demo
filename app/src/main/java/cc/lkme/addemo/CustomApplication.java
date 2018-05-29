@@ -9,9 +9,15 @@ import com.facebook.stetho.Stetho;
  */
 
 public class CustomApplication extends Application {
+    private static CustomApplication instance;
+
+    public static CustomApplication getInstance() {
+        return instance;
+    }
 
     public void onCreate() {
         super.onCreate();
+        instance = this;
         Stetho.initializeWithDefaults(this);
     }
 
