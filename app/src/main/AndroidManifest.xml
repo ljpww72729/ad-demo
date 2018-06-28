@@ -54,9 +54,16 @@
                 android:screenOrientation="portrait"
                 android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".ShowImg">
+        <activity
+                android:name=".ShowImg"
+                android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".PChklistActivity"/>
+        <activity
+                android:name=".PChklistActivity"
+                android:screenOrientation="portrait"/>
+        <activity
+                android:name=".MiniActivity"
+                android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

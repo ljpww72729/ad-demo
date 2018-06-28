@@ -5,4 +5,11 @@
     <string name="check_result_yes">是</string>
     <string name="check_result_no">否</string>
     <string name="uri_tips">total:%1$d; resolved:%2$d; unresolved:%3$d</string>
+
+    <string-array name="mini_type">
+        <item>正式版</item>
+        <item>预览版</item>
+        <item>测试版</item>
+    </string-array>
+
 </resources>

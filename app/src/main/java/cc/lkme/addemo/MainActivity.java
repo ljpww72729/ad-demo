@@ -251,6 +251,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        TextView open_mini_app = findViewById(R.id.open_mini_app);
+        open_mini_app.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MiniActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
 
