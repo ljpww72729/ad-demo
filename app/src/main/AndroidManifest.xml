@@ -64,6 +64,15 @@
         <activity
                 android:name=".MiniActivity"
                 android:screenOrientation="portrait"/>
+
+        <receiver android:name=".MyBroadcastReceiver"/>
+
+        <activity
+                android:name=".NotificationActivity"
+                android:configChanges="keyboardHidden|orientation"
+                android:screenOrientation="portrait">
+
+        </activity>
     </application>
 
 </manifest>

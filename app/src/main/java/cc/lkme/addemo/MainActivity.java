@@ -259,6 +259,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        TextView open_notification = findViewById(R.id.open_notification);
+        open_notification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
