@@ -190,10 +190,10 @@ public class MainActivity extends AppCompatActivity {
         service_down_apk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "http://101.201.51.238:9099/browser/demo.apk";
+                String url = "http://60.205.217.173:9099/browser/demo.apk";
                 Intent intent = new Intent(MainActivity.this, LMDownloadService.class);
                 intent.putExtra(DOWNLOAD_FILE_URL, url);
-                intent.putExtra(DOWNLOAD_FILE_NAME, "lm" + System.currentTimeMillis() + ".apk");
+                intent.putExtra(DOWNLOAD_FILE_NAME, "demo.apk");
                 startService(intent);
             }
         });
