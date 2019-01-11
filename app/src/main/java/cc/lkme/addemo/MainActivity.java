@@ -1,7 +1,10 @@
 package cc.lkme.addemo;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import static cc.lkme.addemo.LMConstants.DOWNLOAD_FILE_NAME;
 import static cc.lkme.addemo.LMConstants.DOWNLOAD_FILE_URL;
@@ -34,6 +38,60 @@ public class MainActivity extends AppCompatActivity {
     EditText deeplinks, package_name;
     EditText app_pkg_name;
 
+    /**
+     * 方法描述：判断某一应用是否正在运行 Created by cafeting on 2017/2/4.
+     *
+     * @param context     上下文
+     * @param packageName 应用的包名
+     * @return true 表示正在运行，false 表示没有运行
+     */
+    public static boolean isAppRunning(Context context, String packageName) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> list = am.getRunningTasks(100);
+        if (list.size() <= 0) {
+            return false;
+        }
+        for (ActivityManager.RunningTaskInfo info : list) {
+            if (info.baseActivity.getPackageName().equals(packageName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //获取已安装应用的 uid，-1 表示未安装此应用或程序异常
+    public static int getPackageUid(Context context, String packageName) {
+        try {
+            ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(packageName, 0);
+            if (applicationInfo != null) {
+//                Log.d(applicationInfo.uid);
+                return applicationInfo.uid;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+        return -1;
+    }
+
+    /**
+     * 判断某一 uid 的程序是否有正在运行的进程，即是否存活 Created by cafeting on 2017/2/4.
+     *
+     * @param context 上下文
+     * @param uid     已安装应用的 uid
+     * @return true 表示正在运行，false 表示没有运行
+     */
+    public static boolean isProcessRunning(Context context, int uid) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> runningServiceInfos = am.getRunningServices(200);
+        if (runningServiceInfos.size() > 0) {
+            for (ActivityManager.RunningServiceInfo appProcess : runningServiceInfos) {
+                if (uid == appProcess.uid) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +103,73 @@ public class MainActivity extends AppCompatActivity {
         }
         deeplinks = (EditText) findViewById(R.id.deeplinks);
 //        deeplinks.setText("https://lkme.cc/IfC/yGs2hfPK8");
-//        deeplinks.setText("http://linkedme.cc:9099/browser/aaa_lipeng.jsp");
-        deeplinks.setText("https://www.linkedme.cc/h5/partner");
+        deeplinks.setText("http://60.205.217.173:9099/browser/test.html");
+//        deeplinks.setText("https://www.linkedme.cc/h5/partner");
         package_name = (EditText) findViewById(R.id.package_name);
         package_name.setText("com.ctoutiao");
+
+        TextView appIsOpen = (TextView) findViewById(R.id.appIsOpen);
+        appIsOpen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String pName = "com.microquation.linkedme";
+                int uid = getPackageUid(MainActivity.this, pName);
+                if (uid > 0) {
+                    boolean rstA = isAppRunning(MainActivity.this, pName);
+                    boolean rstB = isProcessRunning(MainActivity.this, uid);
+                    if (rstA || rstB) {
+                        //指定包名的程序正在运行中
+                        Toast.makeText(MainActivity.this, "正在运行", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //指定包名的程序未在运行中
+                        Toast.makeText(MainActivity.this, "未运行", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    //应用未安装
+                    Toast.makeText(MainActivity.this, "未安装", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+
+        TextView openAndH5 = (TextView) findViewById(R.id.openAndH5);
+        openAndH5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                // 必须先执行打开h5页面再打开App，否则当系统拦截尝试打开其他App时，会被h5页面的activity覆盖，无法看到打开提示对话框
+
+
+                Intent intentWeb = new Intent(MainActivity.this, CustomWebviewActivity.class);
+                intentWeb.putExtra("deeplink_url", deeplinks.getText().toString());
+                startActivity(intentWeb);
+
+//                Intent intent = null;
+//                try {
+//                    intent = Intent.parseUri("lkmedemo://linkedme?click_id=CeG9o5VH8&lkme=1", Intent.URI_INTENT_SCHEME);
+//                } catch (URISyntaxException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                if (intent != null) {
+//                    PackageManager packageManager = getPackageManager();
+//                    ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+//                    if (info != null) {
+//                        //朗易思听： 如果有可接受该intent的APP则直接唤起APP
+//                        //intent.addCategory(Intent.CATEGORY_BROWSABLE);
+//                        Toast.makeText(MainActivity.this, "已安装APP并开始唤起", Toast.LENGTH_LONG).show();
+//                        startActivity(intent);
+//                    }
+//                }
+
+
+            }
+        });
+
+
         TextView webview = (TextView) findViewById(R.id.webview);
         webview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,7 +252,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView liebao = (TextView) findViewById(R.id.liebao);
-        liebao.setOnClickListener(new View.OnClickListener() {
+        liebao.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -149,7 +272,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView showAD = (TextView) findViewById(R.id.showAD);
-        showAD.setOnClickListener(new View.OnClickListener() {
+        showAD.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 new Thread(new Runnable() {
@@ -166,7 +291,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView open_package = (TextView) findViewById(R.id.open_package);
-        open_package.setOnClickListener(new View.OnClickListener() {
+        open_package.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 String package_name_str = package_name.getText().toString().trim();
@@ -187,7 +314,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView service_down_apk = (TextView) findViewById(R.id.service_down_apk);
-        service_down_apk.setOnClickListener(new View.OnClickListener() {
+        service_down_apk.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 String url = "http://60.205.217.173:9099/browser/demo.apk";
@@ -198,7 +327,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView uri_scheme = (TextView) findViewById(R.id.uri_scheme);
-        uri_scheme.setOnClickListener(new View.OnClickListener() {
+        uri_scheme.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, UriSchemeActivity.class);
@@ -207,7 +338,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         TextView uri_scheme_list = (TextView) findViewById(R.id.uri_scheme_list);
-        uri_scheme_list.setOnClickListener(new View.OnClickListener() {
+        uri_scheme_list.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, UriSchemeListActivity.class);
@@ -216,7 +349,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         TextView show_img = (TextView) findViewById(R.id.show_img);
-        show_img.setOnClickListener(new View.OnClickListener() {
+        show_img.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ShowImg.class);
@@ -224,16 +359,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView p_chklst = (TextView) findViewById(R.id.p_chklst);
-        p_chklst.setOnClickListener(new View.OnClickListener() {
+        p_chklst.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, PChklistActivity.class);
                 startActivity(intent);
             }
         });
-        app_pkg_name = (EditText) findViewById(R.id.app_pkg_name);
+        app_pkg_name = (EditText)
+
+                findViewById(R.id.app_pkg_name);
+
         TextView open_instant_app = (TextView) findViewById(R.id.open_instant_app);
-        open_instant_app.setOnClickListener(new View.OnClickListener() {
+        open_instant_app.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 if (TextUtils.isEmpty(app_pkg_name.getText().toString())) {
@@ -252,7 +394,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         TextView open_mini_app = findViewById(R.id.open_mini_app);
-        open_mini_app.setOnClickListener(new View.OnClickListener() {
+        open_mini_app.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MiniActivity.class);
@@ -260,7 +404,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView open_notification = findViewById(R.id.open_notification);
-        open_notification.setOnClickListener(new View.OnClickListener() {
+        open_notification.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
@@ -353,7 +499,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_PHONE_STATE: {
                 if (grantResults.length > 0

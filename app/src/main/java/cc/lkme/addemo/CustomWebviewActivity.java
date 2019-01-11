@@ -93,7 +93,7 @@ public class CustomWebviewActivity extends AppCompatActivity {
 //                                  view.loadUrl(fallbackUrl);
                                 } else {
                                     // view.loadUrl(url);
-                                    return super.shouldOverrideUrlLoading(view, url);
+//                                    return super.shouldOverrideUrlLoading(view, url);
                                 }
                             }
 

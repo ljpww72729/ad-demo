@@ -99,10 +99,10 @@ public class MiniActivity extends AppCompatActivity {
                     Toast.makeText(MiniActivity.this, "小程序原始id不能为空！", Toast.LENGTH_LONG).show();
                     return;
                 }
-                if (TextUtils.isEmpty(pathStr)) {
-                    Toast.makeText(MiniActivity.this, "小程序原始path路径不能为空！", Toast.LENGTH_LONG).show();
-                    return;
-                }
+//                if (TextUtils.isEmpty(pathStr)) {
+//                    Toast.makeText(MiniActivity.this, "小程序原始path路径不能为空！", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
 
                 try {
                     PackageInfo packageInfo = getPackageManager().getPackageInfo("com.tencent.mm", PackageManager.GET_ACTIVITIES);
