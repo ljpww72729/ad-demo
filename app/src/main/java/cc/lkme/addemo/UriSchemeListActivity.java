@@ -1,15 +1,19 @@
 package cc.lkme.addemo;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +21,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -42,6 +48,7 @@ public class UriSchemeListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestPermission();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_uri_scheme_list);
         binding.lpRv.setHasFixedSize(true);
 
@@ -84,8 +91,12 @@ public class UriSchemeListActivity extends AppCompatActivity {
             public void onItemClick(View view, int position) {
                 AppInfo appInfo = mRVData.get(position);
                 if (appInfo.isInstalled()) {
-                    //安装则唤起app
-                    APPUtils.openAppWithUriScheme(UriSchemeListActivity.this, appInfo.getUriScheme(), null, binding.cbSingle.isChecked());
+                    if (appInfo.getUriScheme().contains(" ")) {
+                        Toast.makeText(UriSchemeListActivity.this, "链接中含有空格！", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //安装则唤起app
+                        APPUtils.openAppWithUriScheme(UriSchemeListActivity.this, appInfo.getUriScheme(), null, binding.cbSingle.isChecked());
+                    }
                 } else {
                     //未安装则唤起应用宝安装
                     Uri uri = Uri.parse("market://details?id=" + appInfo.getPackageName());
@@ -164,6 +175,17 @@ public class UriSchemeListActivity extends AppCompatActivity {
 
     }
 
+    public void requestPermission() {
+        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1001);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     private void loadData() {
         ArrayList<AppInfo> data = new ArrayList<>();
         String uriScheme = binding.uriScheme.getText().toString();
@@ -198,5 +220,36 @@ public class UriSchemeListActivity extends AppCompatActivity {
         }
         binding.result.setText(getString(R.string.uri_tips, uri_scheme_arr.length, data.size(), uri_scheme_arr.length - data.size()));
         lpRecyclerViewAdapter.loadDataSuccess(data, 0);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.scan, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.scan:
+                //add the function to perform here
+                Intent intent = new Intent(UriSchemeListActivity.this, ScanActivity.class);
+                startActivityForResult(intent, 1000);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1000) {
+                String result = data.getStringExtra("result");
+                binding.uriScheme.setText(result);
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
