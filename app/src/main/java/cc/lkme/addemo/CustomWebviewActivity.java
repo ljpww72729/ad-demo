@@ -1,5 +1,8 @@
 package cc.lkme.addemo;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -8,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
@@ -64,45 +68,8 @@ public class CustomWebviewActivity extends AppCompatActivity {
                     return false;
                 }
                 if (url.matches(rfc2396regex)) {
-                    // 朗易思听： 我们有个三秒的超时逻辑走market，因此当走market的uri scheme的时候，你直接过滤掉，不要唤起应用市场
-                    try {
-                        Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
-
-                        if (intent != null) {
-                            //  view.stopLoading();
-
-                            PackageManager packageManager = getPackageManager();
-                            ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-                            if (info != null) {
-                                //朗易思听： 如果有可接受该intent的APP则直接唤起APP
-                                //intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                                Toast.makeText(CustomWebviewActivity.this, "已安装APP并开始唤起", Toast.LENGTH_LONG).show();
-                                startActivity(intent);
-                            } else {
-                                //朗易思听： 走到该逻辑，说明没有安装app，你native调用market唤起应用市场下载app
-                                Toast.makeText(CustomWebviewActivity.this, "未安装APP跳转到自定义页面", Toast.LENGTH_LONG).show();
-                                //否则加载回调页面
-                                String fallbackUrl = intent.getStringExtra("browser_fallback_url");
-
-                                if (!TextUtils.isEmpty(fallbackUrl)) {
-                                    // 调用外置浏览器加载回调页面,建议外置浏览器加载回调页面
-                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUrl));
-                                    startActivity(browserIntent);
-
-                                    //或者:在WebView中加载
-//                                  view.loadUrl(fallbackUrl);
-                                } else {
-                                    // view.loadUrl(url);
-//                                    return super.shouldOverrideUrlLoading(view, url);
-                                }
-                            }
-
-                            return true;
-                        }
-                    } catch (URISyntaxException e) {
-                        //对uri语法异常的处理
-                        e.printStackTrace();
-                    }
+                    showAlert(url);
+                    return true;
                 }
                 view.loadUrl(url);
                 return false;
@@ -142,5 +109,70 @@ public class CustomWebviewActivity extends AppCompatActivity {
 //        }
 //
 //    }
+
+    public void showAlert(final String info) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle("Uri Scheme 跳转提示").setMessage("以下为捕获到的Uri Scheme\n\n" + info + "\n\n 是否跳转？").setPositiveButton("跳转", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openApp(info);
+                    }
+                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).setNeutralButton("复制", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ClipboardManager cbm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                        cbm.setPrimaryClip(ClipData.newPlainText("uri scheme", info));
+                        Toast.makeText(CustomWebviewActivity.this, "已复制到剪切板", Toast.LENGTH_SHORT).show();
+                    }
+                }).create();
+        alertDialog.show();
+    }
+
+    public void openApp(String url) {
+        // 朗易思听： 我们有个三秒的超时逻辑走market，因此当走market的uri scheme的时候，你直接过滤掉，不要唤起应用市场
+        try {
+            Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+
+            if (intent != null) {
+                //  view.stopLoading();
+
+                PackageManager packageManager = getPackageManager();
+                ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                if (info != null) {
+                    //朗易思听： 如果有可接受该intent的APP则直接唤起APP
+                    //intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    Toast.makeText(CustomWebviewActivity.this, "已安装APP并开始唤起", Toast.LENGTH_LONG).show();
+                    startActivity(intent);
+                } else {
+                    //朗易思听： 走到该逻辑，说明没有安装app，你native调用market唤起应用市场下载app
+                    Toast.makeText(CustomWebviewActivity.this, "未安装APP跳转到自定义页面", Toast.LENGTH_LONG).show();
+                    //否则加载回调页面
+                    String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+
+                    if (!TextUtils.isEmpty(fallbackUrl)) {
+                        // 调用外置浏览器加载回调页面,建议外置浏览器加载回调页面
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUrl));
+                        startActivity(browserIntent);
+
+                        //或者:在WebView中加载
+//                                  view.loadUrl(fallbackUrl);
+                    } else {
+                        // view.loadUrl(url);
+//                                    return super.shouldOverrideUrlLoading(view, url);
+                    }
+                }
+
+            }
+        } catch (URISyntaxException e) {
+            //对uri语法异常的处理
+            e.printStackTrace();
+        }
+    }
+
 
 }

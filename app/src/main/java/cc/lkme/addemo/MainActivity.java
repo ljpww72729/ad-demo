@@ -252,9 +252,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView liebao = (TextView) findViewById(R.id.liebao);
-        liebao.setOnClickListener(new View.OnClickListener()
-
-        {
+        liebao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -272,9 +270,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView showAD = (TextView) findViewById(R.id.showAD);
-        showAD.setOnClickListener(new View.OnClickListener()
-
-        {
+        showAD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new Thread(new Runnable() {
@@ -291,9 +287,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView open_package = (TextView) findViewById(R.id.open_package);
-        open_package.setOnClickListener(new View.OnClickListener()
-
-        {
+        open_package.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String package_name_str = package_name.getText().toString().trim();
@@ -314,9 +308,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView service_down_apk = (TextView) findViewById(R.id.service_down_apk);
-        service_down_apk.setOnClickListener(new View.OnClickListener()
-
-        {
+        service_down_apk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String url = "http://60.205.217.173:9099/browser/demo.apk";
@@ -327,9 +319,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView uri_scheme = (TextView) findViewById(R.id.uri_scheme);
-        uri_scheme.setOnClickListener(new View.OnClickListener()
-
-        {
+        uri_scheme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, UriSchemeActivity.class);
@@ -338,9 +328,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         TextView uri_scheme_list = (TextView) findViewById(R.id.uri_scheme_list);
-        uri_scheme_list.setOnClickListener(new View.OnClickListener()
-
-        {
+        uri_scheme_list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, UriSchemeListActivity.class);
@@ -349,9 +337,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         TextView show_img = (TextView) findViewById(R.id.show_img);
-        show_img.setOnClickListener(new View.OnClickListener()
-
-        {
+        show_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ShowImg.class);
@@ -359,9 +345,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView p_chklst = (TextView) findViewById(R.id.p_chklst);
-        p_chklst.setOnClickListener(new View.OnClickListener()
-
-        {
+        p_chklst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, PChklistActivity.class);
@@ -373,9 +357,7 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.app_pkg_name);
 
         TextView open_instant_app = (TextView) findViewById(R.id.open_instant_app);
-        open_instant_app.setOnClickListener(new View.OnClickListener()
-
-        {
+        open_instant_app.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (TextUtils.isEmpty(app_pkg_name.getText().toString())) {
@@ -394,9 +376,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         TextView open_mini_app = findViewById(R.id.open_mini_app);
-        open_mini_app.setOnClickListener(new View.OnClickListener()
-
-        {
+        open_mini_app.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MiniActivity.class);
@@ -404,12 +384,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         TextView open_notification = findViewById(R.id.open_notification);
-        open_notification.setOnClickListener(new View.OnClickListener()
-
-        {
+        open_notification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        TextView open_h5listener = findViewById(R.id.open_h5listener);
+        open_h5listener.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, H5ListenerActivity.class);
                 startActivity(intent);
             }
         });

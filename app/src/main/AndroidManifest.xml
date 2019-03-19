@@ -77,6 +77,7 @@
         <activity
                 android:name=".ScanActivity"
                 android:screenOrientation="portrait"/>
+        <activity android:name=".H5ListenerActivity"/>
     </application>
 
 </manifest>
