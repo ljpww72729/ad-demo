@@ -2,12 +2,15 @@ package cc.lkme.addemo;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,7 +30,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static cc.lkme.addemo.LMConstants.DOWNLOAD_FILE_NAME;
 import static cc.lkme.addemo.LMConstants.DOWNLOAD_FILE_URL;
@@ -103,10 +109,11 @@ public class MainActivity extends AppCompatActivity {
         }
         deeplinks = (EditText) findViewById(R.id.deeplinks);
 //        deeplinks.setText("https://lkme.cc/IfC/yGs2hfPK8");
-        deeplinks.setText("http://60.205.217.173:9099/browser/test.html");
+        deeplinks.setText("http://192.168.254.7:8080/browser/zhangdama.html");
 //        deeplinks.setText("https://www.linkedme.cc/h5/partner");
         package_name = (EditText) findViewById(R.id.package_name);
         package_name.setText("com.ctoutiao");
+        getIntent().getExtras();
 
         TextView appIsOpen = (TextView) findViewById(R.id.appIsOpen);
         appIsOpen.setOnClickListener(new View.OnClickListener() {
@@ -400,7 +407,69 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        TextView storage = findViewById(R.id.storage);
+        storage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, StorageActivity.class);
+                startActivity(intent);
+            }
+        });
+        TextView uri_scheme_jd = findViewById(R.id.uri_scheme_jd);
+        uri_scheme_jd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, JDActivity.class);
+                startActivity(intent);
+            }
+        });
 
+        getSign(this);
+        if (getIntent() != null) {
+            String data = getIntent().getDataString();
+            Log.i("data====", "onCreate: " + data);
+            Toast.makeText(MainActivity.this, "data is " + data, Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    public String getSign(Context ctx) {
+        try {
+            PackageInfo packageInfo = ctx.getPackageManager().getPackageInfo("com.jingdong.app.mall",
+                    PackageManager.GET_SIGNATURES);
+            Signature[] signs = packageInfo.signatures;
+            Signature sign = signs[0];
+            MessageDigest md1 = MessageDigest.getInstance("MD5");
+            md1.update(sign.toByteArray());
+            byte[] digest = md1.digest();
+            String res = toHexString(digest);
+            Log.i("LinkedME", "onCreate: MD5 === " + res);
+            MessageDigest md2 = MessageDigest.getInstance("SHA1");
+            md2.update(sign.toByteArray());
+            byte[] digest2 = md2.digest();
+            String res2 = toHexString(digest2);
+            Log.i("LinkedME", "onCreate: SHA1 === " + res2);
+            MessageDigest md3 = MessageDigest.getInstance("SHA256");
+            md3.update(sign.toByteArray());
+            byte[] digest3 = md3.digest();
+            String res3 = toHexString(digest3);
+            Log.i("LinkedME", "onCreate: SHA256 === " + res3);
+            return res2;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    private String toHexString(byte[] bytes) {
+        StringBuilder buf = new StringBuilder(bytes.length + bytes.length);
+        for (byte b : bytes) {
+            if (((int) b & 0xff) < 0x10) {
+                buf.append("0");
+            }
+            buf.append(Long.toString((int) b & 0xff, 16));
+        }
+        return buf.toString();
     }
 
 
@@ -520,6 +589,37 @@ public class MainActivity extends AppCompatActivity {
             return false;
         } else {
             return true;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                ClipboardManager cbm = (ClipboardManager) MainActivity.this.getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                if (cbm != null && cbm.hasPrimaryClip()) {
+                    if (cbm.getPrimaryClip().getItemCount() > 0) {
+                        CharSequence temp = cbm.getPrimaryClip().getItemAt(0).getText();
+                        Log.d("linkedme", "剪切板数据== " + temp);
+                        if (TextUtils.isEmpty(temp)) {
+                        }
+                        String PATTERNTRANSACTIONTYPE = "`\\+(.+)`\\+";
+                        // 创建 Pattern 对象
+                        Pattern r = Pattern.compile(PATTERNTRANSACTIONTYPE);
+                        // 现在创建 matcher 对象
+                        Matcher m = r.matcher(temp);
+                        if (m.find() && m.groupCount() > 0) {
+                            // 清空剪切板
+                            ClipData clipData = ClipData.newPlainText("", "");
+                            cbm.setPrimaryClip(clipData);
+                            Log.d("linkedme", "剪切板数据1111== " + m.group(1));
+                            return;
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignore) {
         }
     }
 }

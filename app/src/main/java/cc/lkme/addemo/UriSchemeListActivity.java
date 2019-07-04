@@ -21,9 +21,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.ww.lp.rvrl_lib.LPRecyclerViewAdapter;
@@ -34,6 +36,7 @@ import com.ww.lp.rvrl_lib.SingleItemClickListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import cc.lkme.addemo.databinding.ActivityUriSchemeListBinding;
@@ -44,6 +47,7 @@ public class UriSchemeListActivity extends AppCompatActivity {
     private LinearLayoutManager mLayoutManager;
     private ArrayList<AppInfo> mRVData;
     private LPRecyclerViewAdapter<AppInfo> lpRecyclerViewAdapter;
+    private Button copy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,6 +175,28 @@ public class UriSchemeListActivity extends AppCompatActivity {
                 loadData();
             }
 
+        });
+
+        if (getIntent() != null) {
+            String data = getIntent().getDataString();
+            Log.i("data====", "onCreate: " + data);
+            if (data != null && data.startsWith("openapp.jdmobile")) {
+                String params = data.substring(data.indexOf("{"));
+                String paramsEncode = URLEncoder.encode(params);
+                String lastInfo = "openapp.jdmobile://virtual?params=" + paramsEncode;
+                binding.uriScheme.setText(lastInfo);
+            }
+
+//            Toast.makeText(UriSchemeListActivity.this, "data is " + data, Toast.LENGTH_LONG).show();
+        }
+        binding.copy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ClipboardManager cbm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                cbm.setPrimaryClip(ClipData.newPlainText("uri scheme", binding.uriScheme.getText().toString()));
+                Toast.makeText(UriSchemeListActivity.this, "已复制到剪切板", Toast.LENGTH_SHORT).show();
+            }
         });
 
     }

@@ -1,24 +1,43 @@
 apply plugin: 'com.android.application'
 
 android {
+
+
+    signingConfigs {
+//        必须这么配置,是因为用的这个debug.keystore申请的微信、微博的appKey
+//        当然,keyPassword与storePassword可以不用,为什么?android为debug.keystore默认的密码
+        debug {
+            storeFile file('debug.keystore')
+            keyPassword 'android'
+            storePassword 'android'
+        }
+    }
+
     compileSdkVersion 27
     buildToolsVersion '28.0.3'
     defaultConfig {
-        applicationId "cc.lkme.addemo"
+        applicationId "com.microquation.linkedme"
         minSdkVersion 14
         targetSdkVersion 27
         versionCode 8
         versionName "1.0.8"
+        vectorDrawables.useSupportLibrary = true
+
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug{
+            minifyEnabled false
+            signingConfigs.debug
+        }
     }
     dataBinding {
         enabled = true
     }
+
 }
 
 ext {
@@ -30,6 +49,7 @@ dependencies {
     implementation 'com.facebook.stetho:stetho:1.4.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation "com.android.support:appcompat-v7:${supportVersion}"
+    implementation "com.android.support:support-vector-drawable:${supportVersion}"
     implementation "com.android.support:support-v4:${supportVersion}"
     implementation "com.android.support:design:${supportVersion}"
     implementation "com.android.support:cardview-v7:${supportVersion}"
@@ -37,4 +57,7 @@ dependencies {
     implementation 'com.github.ljpww72729:rvrl-lib:1.0.2'
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:5.1.4'
     implementation 'cn.bingoogolapple:bga-qrcode-zxing:1.3.6'
+    implementation files('libs/jd_crash_lib_release_210.jar')
+    implementation files('libs/JDSDK_h.jar')
+    implementation project(path: ':13261f6a593570a1e24ca4a8cd6c16a1')
 }

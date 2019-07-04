@@ -14,12 +14,17 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.webkit.JavascriptInterface;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 /**
  * Created by LinkedME06 on 16/10/12.
@@ -28,6 +33,9 @@ import java.net.URISyntaxException;
 public class CustomWebviewActivity extends AppCompatActivity {
 
     private WebView start_webview;
+    //这是要注入的javascript，注意：前面的“javascript：”是必须的，后面就是要注入的语句
+    private static final String insertJavaScript = "javascript:window.onload=function(){ alert('abcdklj')}";
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,13 +48,27 @@ public class CustomWebviewActivity extends AppCompatActivity {
         WebSettings webSettings = start_webview.getSettings();
         //允许javascript
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             webSettings.setAllowUniversalAccessFromFileURLs(true);
         }
 //        start_webview.addJavascriptInterface(new MyJavaScriptInterface(this), "HtmlViewer");
 //        start_webview.loadUrl(getIntent().getStringExtra("deeplink_url") + "?"+ DeviceInfo.getInstance(CustomWebviewActivity.this).getParams("com.ctoutiao", "1"));
-        start_webview.loadUrl(getIntent().getStringExtra("deeplink_url"));
+//        start_webview.loadUrl(getIntent().getStringExtra("deeplink_url"));
+        start_webview.loadUrl("http://192.168.254.7:8080/browser/standard.html");
+        start_webview.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        start_webview.loadUrl("javascript: hello();");
+                    }
+                }).start();
+            }
+        }, 3000);
         start_webview.setWebViewClient(new WebViewClient() {
+
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -68,7 +90,8 @@ public class CustomWebviewActivity extends AppCompatActivity {
                     return false;
                 }
                 if (url.matches(rfc2396regex)) {
-                    showAlert(url);
+//                    showAlert(url);
+                    openApp(url);
                     return true;
                 }
                 view.loadUrl(url);
@@ -81,17 +104,73 @@ public class CustomWebviewActivity extends AppCompatActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 // TODO Auto-generated method stub
                 super.onPageStarted(view, url, favicon);
-            }
+//                view.loadUrl(insertJavaScript);
 
+            }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 // TODO Auto-generated method stub
-//                start_webview.loadUrl("javascript:window.HtmlViewer.showHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
                 super.onPageFinished(view, url);
+                injectImgClick();
+
+            }
+
+
+        });
+
+        start_webview.addJavascriptInterface(new Object() {
+            @JavascriptInterface
+            public void openImage(int i, String src) {
+                ArrayList<String> list = new ArrayList<String>();
+                list.add(src);
+                Toast.makeText(CustomWebviewActivity.this, "sss", Toast.LENGTH_SHORT).show();
+//                mActivity.startActivity(new Intent(mActivity, PhotoViewActivity.class).putExtra(PhotoViewActivity.EXTRA_PHOTOS, list)
+//                        .putExtra(PhotoViewActivity.EXTRA_TYPE, PhotoViewActivity.TYPE_VIEW));
+            }
+        }, "toolbox");
+
+        start_webview.setWebChromeClient(new WebChromeClient() {
+
+            @Override
+            public void onReceivedTitle(WebView view, String title) {
+                super.onReceivedTitle(view, title);
+                if (title != null) {
+                    ((TextView) findViewById(R.id.title)).setText(title);
+                }
+            }
+
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
+                AlertDialog.Builder b = new AlertDialog.Builder(CustomWebviewActivity.this);
+                b.setTitle("Alert");
+                b.setMessage(message);
+                b.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        result.confirm();
+                    }
+                });
+                b.setCancelable(false);
+                b.create().show();
+                return true;
             }
 
         });
+    }
+
+    // 注入js函数监听
+    public void injectImgClick() {
+//        start_webview.loadUrl("javascript:(function(){var objs = document.getElementsByTagName('img');for(var i = 0; i <objs.length; i++) {objs[i].onclick = function() {window.toolbox.openImage(i,this.src);};}})()");
+
+        start_webview.loadUrl("javascript:var injectScript = document.createElement('script'); injectScript.src='http://10.11.12.188:8090/browser/duo.js';injectScript.id='UTEST_injectScript'; document.head.appendChild(injectScript);");
+
+//        start_webview.loadUrl("javascript: alert('hello');");
+
+
+//        start_webview.loadUrl("javascript:var script = document.createElement('script');  script.appendChild(document.createTextNode(\"function sayHi() {alert('hi,Android');}; \"));document.head.appendChild(script);");
+
+
     }
 
 
@@ -146,7 +225,7 @@ public class CustomWebviewActivity extends AppCompatActivity {
                 if (info != null) {
                     //朗易思听： 如果有可接受该intent的APP则直接唤起APP
                     //intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                    Toast.makeText(CustomWebviewActivity.this, "已安装APP并开始唤起", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(CustomWebviewActivity.this, "已安装APP并开始唤起", Toast.LENGTH_LONG).show();
                     startActivity(intent);
                 } else {
                     //朗易思听： 走到该逻辑，说明没有安装app，你native调用market唤起应用市场下载app
