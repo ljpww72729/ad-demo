@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ADDemo</string>
+    <string name="app_name">AdTools</string>
     <string name="install">未安装</string>
     <string name="installed">已安装</string>
     <string name="check_result_yes">是</string>

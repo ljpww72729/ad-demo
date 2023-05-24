@@ -2,29 +2,36 @@ package cc.lkme.addemo;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+
+import javax.annotation.Nullable;
 
 /**
  * Created by LinkedME06 on 16/10/12.
@@ -33,6 +40,7 @@ import java.util.ArrayList;
 public class CustomWebviewActivity extends AppCompatActivity {
 
     private WebView start_webview;
+    private TextView config;
     //这是要注入的javascript，注意：前面的“javascript：”是必须的，后面就是要注入的语句
     private static final String insertJavaScript = "javascript:window.onload=function(){ alert('abcdklj')}";
 
@@ -45,28 +53,55 @@ public class CustomWebviewActivity extends AppCompatActivity {
             WebView.setWebContentsDebuggingEnabled(true);
         }
         start_webview = (WebView) findViewById(R.id.start_webview);
+        config = findViewById(R.id.config);
+        config.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog dialogBuilder = new AlertDialog.Builder(CustomWebviewActivity.this).create();
+                LayoutInflater inflater = CustomWebviewActivity.this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_dialog, null);
+
+                final EditText urlEditText = dialogView.findViewById(R.id.edt_comment);
+                Button submit = dialogView.findViewById(R.id.buttonSubmit);
+                Button cancel = dialogView.findViewById(R.id.buttonCancel);
+
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialogBuilder.dismiss();
+                    }
+                });
+                submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        SharedPreferences sharedPreferences = CustomWebviewActivity.this.getSharedPreferences("url_info", Context.MODE_PRIVATE);
+                        sharedPreferences.edit().putString("url", urlEditText.getText().toString()).apply();
+                        start_webview.loadUrl(urlEditText.getText().toString());
+                        dialogBuilder.dismiss();
+                    }
+                });
+
+                dialogBuilder.setView(dialogView);
+                dialogBuilder.show();
+            }
+        });
         WebSettings webSettings = start_webview.getSettings();
         //允许javascript
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             webSettings.setAllowUniversalAccessFromFileURLs(true);
         }
+//        SharedPreferences sharedPreferences = CustomWebviewActivity.this.getSharedPreferences("url_info", Context.MODE_PRIVATE);
+//        String url = sharedPreferences.getString("url", "https://www.linkedme.cc/verify/oneKeyLogin.html/req-localhost.html");
 //        start_webview.addJavascriptInterface(new MyJavaScriptInterface(this), "HtmlViewer");
 //        start_webview.loadUrl(getIntent().getStringExtra("deeplink_url") + "?"+ DeviceInfo.getInstance(CustomWebviewActivity.this).getParams("com.ctoutiao", "1"));
-//        start_webview.loadUrl(getIntent().getStringExtra("deeplink_url"));
-        start_webview.loadUrl("http://192.168.254.7:8080/browser/standard.html");
-        start_webview.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        start_webview.loadUrl("javascript: hello();");
-                    }
-                }).start();
-            }
-        }, 3000);
+        String url = getIntent().getStringExtra("deeplink_url");
+        start_webview.loadUrl(url);
+//        start_webview.loadUrl("https://testopdatakw.linkedme.cc/article/articleDetail.do?id=6695602665772024333");
         start_webview.setWebViewClient(new WebViewClient() {
 
 
@@ -90,8 +125,8 @@ public class CustomWebviewActivity extends AppCompatActivity {
                     return false;
                 }
                 if (url.matches(rfc2396regex)) {
-//                    showAlert(url);
-                    openApp(url);
+                    showAlert(url);
+//                    openApp(url);
                     return true;
                 }
                 view.loadUrl(url);
@@ -112,7 +147,7 @@ public class CustomWebviewActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 // TODO Auto-generated method stub
                 super.onPageFinished(view, url);
-                injectImgClick();
+//                injectImgClick();
 
             }
 
@@ -157,6 +192,12 @@ public class CustomWebviewActivity extends AppCompatActivity {
             }
 
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        start_webview.destroy();
+        finish();
     }
 
     // 注入js函数监听

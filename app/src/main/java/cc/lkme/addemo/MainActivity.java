@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 1000;
     EditText deeplinks, package_name;
     EditText app_pkg_name;
+    TextView dplink;
 
     /**
      * 方法描述：判断某一应用是否正在运行 Created by cafeting on 2017/2/4.
@@ -102,12 +103,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        // 原生App中可以使用hap、http、https三种链接
+        intent.setData(Uri.parse("hap://app/com.example/Detail?key1=value1&key2=value2"));
+        startActivity(intent);
         setContentView(R.layout.activity_main);
         getPermission(MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1002);
         }
         deeplinks = (EditText) findViewById(R.id.deeplinks);
+        dplink = (TextView) findViewById(R.id.dplink);
 //        deeplinks.setText("https://lkme.cc/IfC/yGs2hfPK8");
         deeplinks.setText("http://192.168.254.7:8080/browser/zhangdama.html");
 //        deeplinks.setText("https://www.linkedme.cc/h5/partner");
@@ -183,6 +189,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, CustomWebviewActivity.class);
                 intent.putExtra("deeplink_url", deeplinks.getText().toString());
+                startActivity(intent);
+            }
+        });
+
+        TextView deviceInfo = findViewById(R.id.device_info);
+        deviceInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, DeviceInfoActivity.class);
                 startActivity(intent);
             }
         });
@@ -424,11 +439,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        getSign(this);
+//        getSign(this);
         if (getIntent() != null) {
             String data = getIntent().getDataString();
-            Log.i("data====", "onCreate: " + data);
-            Toast.makeText(MainActivity.this, "data is " + data, Toast.LENGTH_LONG).show();
+            if (data != null) {
+                Log.i("data====", "onCreate: " + data);
+                dplink.setText(data);
+                Toast.makeText(MainActivity.this, "data is " + data, Toast.LENGTH_LONG).show();
+            }
         }
     }
 

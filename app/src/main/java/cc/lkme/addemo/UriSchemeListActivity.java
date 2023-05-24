@@ -181,9 +181,15 @@ public class UriSchemeListActivity extends AppCompatActivity {
             String data = getIntent().getDataString();
             Log.i("data====", "onCreate: " + data);
             if (data != null && data.startsWith("openapp.jdmobile")) {
-                String params = data.substring(data.indexOf("{"));
-                String paramsEncode = URLEncoder.encode(params);
-                String lastInfo = "openapp.jdmobile://virtual?params=" + paramsEncode;
+                String lastInfo;
+                if (data.contains("{")) {
+                    String params = data.substring(data.indexOf("{"));
+                    String paramsEncode = URLEncoder.encode(params);
+                    lastInfo = "openapp.jdmobile://virtual?params=" + paramsEncode;
+                } else {
+                    lastInfo = data;
+                }
+
                 binding.uriScheme.setText(lastInfo);
             }
 
